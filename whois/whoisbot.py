@@ -3,7 +3,7 @@ from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 
 #Configuration
-contactpoints = ['54.152.60.220','52.87.197.72']
+contactpoints = ['1.2.3.4','4.3.2.1']
 auth_provider = PlainTextAuthProvider (username='whois', password='Wh0D4t23')
 keyspace = "whois"
 
