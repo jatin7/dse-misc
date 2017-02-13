@@ -1,0 +1,5 @@
+val srctable =  sc.cassandraTable("whois","chan")
+srctable.saveToCassandra("whois","chan_latest")
+
+copy whois.chan_latest  TO '/tmp/chan_latest.cql';
+copy whois.info  TO '/tmp/info.cql';
