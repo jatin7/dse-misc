@@ -7,8 +7,9 @@ schema.vertexLabel('mode').create()
 schema.vertexLabel('nick').create()
 
 schema.propertyKey('timestamp').Text().create()
+schema.propertyKey('nickname').Text().create()
 
-schema.edgeLabel('hasAccess').properties('timestamp').connection('channel','mode').create()
+schema.edgeLabel('hasAccess').properties('nickname').connection('channel','mode').create()
 schema.edgeLabel('has').properties('timestamp').connection('network','channel').create()
 schema.edgeLabel('connectsTo').properties('timestamp').connection('nick','network').create()
 schema.edgeLabel('hasName').properties('timestamp').connection('nick','realname').create()

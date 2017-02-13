@@ -13,130 +13,125 @@ config create_schema: false, load_new: false, load_vertex_threads: 3
 // inputfiledir is the directory for the input files
 
 inputfiledir = './'
-nickInput = File.csv(inputfiledir + "nick.csv").delimiter(',')
-identdInput = File.csv(inputfiledir + "identd.csv").delimiter(',')
-hostnameInput = File.csv(inputfiledir + "hostname.csv").delimiter(',')
-realnameInput = File.csv(inputfiledir + "realname.csv").delimiter(',')
-channelInput = File.csv(inputfiledir + "channel.csv").delimiter(',')
-networkInput = File.csv(inputfiledir + "network.csv").delimiter(',')
-modeInput = File.csv(inputfiledir + "mode.csv").delimiter(',')
+nickV = File.csv(inputfiledir + "nick.csv").delimiter(',')
+identdV = File.csv(inputfiledir + "identd.csv").delimiter(',')
+hostnameV = File.csv(inputfiledir + "hostname.csv").delimiter(',')
+realnameV = File.csv(inputfiledir + "realname.csv").delimiter(',')
+channelV = File.csv(inputfiledir + "channel.csv").delimiter(',')
+networkV = File.csv(inputfiledir + "network.csv").delimiter(',')
+modeV = File.csv(inputfiledir + "mode.csv").delimiter(',')
+
+nickidentdE = File.csv(inputfiledir + "nickidentd.csv").delimiter(',')
+nickhostnameE = File.csv(inputfiledir + "nickhostname.csv").delimiter(',')
+nickrealnameE = File.csv(inputfiledir + "nickrealname.csv").delimiter(',')
+nickchannelE = File.csv(inputfiledir + "nickchannel.csv").delimiter(',')
+networkchannelE = File.csv(inputfiledir + "networkchannel.csv").delimiter(',')
+channelmodeE = File.csv(inputfiledir + "channelmode.csv").delimiter(',')
 
 //Specifies what data source to load using which mapper (as defined inline)
   
-load(nickInput).asVertices {
+load(nickV).asVertices {
     label "nickname"
     key "nickname"
 }
 
-load(identdInput).asVertices {
+load(identdV).asVertices {
     label "identd"
     key "identd"
 }
 
-load(hostnameInput).asVertices {
+load(hostnameV).asVertices {
     label "hostname"
     key "hostname"
 }
 
-load(realnameInput).asVertices {
+load(realnameV).asVertices {
     label "realname"
     key "realname"
 }
 
-load(channelInput).asVertices {
+load(channelV).asVertices {
     label "channel"
     key "channel"
 }
 
-load(networkInput).asVertices {
+load(networkV).asVertices {
     label "network"
     key "network"
 }
 
-load(modeInput).asVertices {
+load(modeV).asVertices {
     label "mode"
     key "mode"
 }
 
-load(authorBookInput).asEdges {
-    label "authored"
-    outV "aname", {
-        label "author"
-        key "name"
-    }
-    inV "bname", {
-        label "book"
-        key "name"
-    }
-}
-
-load(nickInput).asEdges {
+load(nickidentdE).asEdges {
     label "hasIdent"
-    outV "anick", {
+    outV "nick", {
         label "nick"
         key "nick"
     }
-    inV "bident", {
+    inV "ident", {
         label "ident"
         key "ident"
     }
 }
 
-load(nickInput).asEdges {
+load(nickhostnameE).asEdges {
     label "hasHostname"
-    outV "anick", {
+    outV "nick", {
         label "nick"
         key "nick"
     }
-    inV "bhostname", {
+    inV "hostname", {
         label "hostname"
         key "hostname"
     }
 }
 
-load(nickInput).asEdges {
+load(nickrealnameE).asEdges {
     label "hasRealname"
-    outV "anick", {
+    outV "nick", {
         label "nick"
         key "nick"
     }
-    inV "brealname", {
+    inV "realname", {
         label "realname"
         key "realname"
     }
 }
 
-load(nickInput).asEdges {
+load(nicknetworkE).asEdges {
     label "connectsTo"
-    outV "anick", {
+    outV "nick", {
         label "nick"
         key "nick"
     }
-    inV "bnetwork", {
+    inV "network", {
         label "network"
         key "network"
     }
 }
 
-load(networkInput).asEdges {
+load(networkchannelE).asEdges {
     label "has"
-    outV "anetwork", {
+    outV "network", {
         label "network"
         key "network"
     }
-    inV "bchannel", {
+    inV "channel", {
         label "channel"
         key "channel"
     }
 }
 
-load(channelInput).asEdges {
+load(channelmodeE).asEdges {
     label "hasAccess"
-    outV "achannel", {
+    outV "channel", {
         label "channel"
         key "channel"
     }
-    inV "bmode", {
+    inV "mode", {
         label "mode"
         key "mode"
     }
