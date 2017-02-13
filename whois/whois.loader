@@ -1,0 +1,144 @@
+/* SAMPLE INPUT
+author: Julia Child|F
+book: Simca's Cuisine: 100 Classic French Recipes for Every Occasion|1972|0-394-40152-2
+authorBook: Simca's Cuisine: 100 Classic French Recipes for Every Occasion|Simone Beck
+ */
+
+// CONFIGURATION
+// Configures the data loader to create the schema
+config create_schema: false, load_new: false, load_vertex_threads: 3
+
+// DATA INPUT
+// Define the data input source (a file which can be specified via command line arguments)
+// inputfiledir is the directory for the input files
+
+inputfiledir = './'
+nickInput = File.csv(inputfiledir + "nick.csv").delimiter(',')
+identdInput = File.csv(inputfiledir + "identd.csv").delimiter(',')
+hostnameInput = File.csv(inputfiledir + "hostname.csv").delimiter(',')
+realnameInput = File.csv(inputfiledir + "realname.csv").delimiter(',')
+channelInput = File.csv(inputfiledir + "channel.csv").delimiter(',')
+networkInput = File.csv(inputfiledir + "network.csv").delimiter(',')
+modeInput = File.csv(inputfiledir + "mode.csv").delimiter(',')
+
+//Specifies what data source to load using which mapper (as defined inline)
+  
+load(nickInput).asVertices {
+    label "nickname"
+    key "nickname"
+}
+
+load(identdInput).asVertices {
+    label "identd"
+    key "identd"
+}
+
+load(hostnameInput).asVertices {
+    label "hostname"
+    key "hostname"
+}
+
+load(realnameInput).asVertices {
+    label "realname"
+    key "realname"
+}
+
+load(channelInput).asVertices {
+    label "channel"
+    key "channel"
+}
+
+load(networkInput).asVertices {
+    label "network"
+    key "network"
+}
+
+load(modeInput).asVertices {
+    label "mode"
+    key "mode"
+}
+
+load(authorBookInput).asEdges {
+    label "authored"
+    outV "aname", {
+        label "author"
+        key "name"
+    }
+    inV "bname", {
+        label "book"
+        key "name"
+    }
+}
+
+load(nickInput).asEdges {
+    label "hasIdent"
+    outV "anick", {
+        label "nick"
+        key "nick"
+    }
+    inV "bident", {
+        label "ident"
+        key "ident"
+    }
+}
+
+load(nickInput).asEdges {
+    label "hasHostname"
+    outV "anick", {
+        label "nick"
+        key "nick"
+    }
+    inV "bhostname", {
+        label "hostname"
+        key "hostname"
+    }
+}
+
+load(nickInput).asEdges {
+    label "hasRealname"
+    outV "anick", {
+        label "nick"
+        key "nick"
+    }
+    inV "brealname", {
+        label "realname"
+        key "realname"
+    }
+}
+
+load(nickInput).asEdges {
+    label "connectsTo"
+    outV "anick", {
+        label "nick"
+        key "nick"
+    }
+    inV "bnetwork", {
+        label "network"
+        key "network"
+    }
+}
+
+load(networkInput).asEdges {
+    label "has"
+    outV "anetwork", {
+        label "network"
+        key "network"
+    }
+    inV "bchannel", {
+        label "channel"
+        key "channel"
+    }
+}
+
+load(channelInput).asEdges {
+    label "hasAccess"
+    outV "achannel", {
+        label "channel"
+        key "channel"
+    }
+    inV "bmode", {
+        label "mode"
+        key "mode"
+    }
+}
+
