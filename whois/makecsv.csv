@@ -1,0 +1,14 @@
+awk -F, '{print $2}' info.cql | sort | uniq > nickV.csv
+awk -F, '{print $5}' info.cql | sort | uniq > identV.csv
+awk -F, '{print $4}' info.cql | sort | uniq > hostnameV.csv
+awk -F, '{print $6}' info.cql | sort | uniq > realnameV.csv
+awk -F, '{print $1 "-" $3}' chan.cql | sort | uniq > channelV.csv
+awk -F, '{print $1}' info.cql | sort | uniq > networkV.csv
+awk -F, '{print $5}' chan.cql | sort | uniq > modeV.csv
+
+awk -F, '{print $2 "," $5}' info.cql | sort | uniq > nickidentd.csv
+awk -F, '{print $2 "," $4}' info.cql | sort | uniq > nickhostname.csv
+awk -F, '{print $2 "," $6}' info.cql | sort | uniq > nickrealname.csv
+awk -F, '{print $2 "," $1 "-" $3}' chan.cql | sort | uniq > nickchannel.csv
+awk -F, '{print $1 "," $1 "-" $3}' chan.cql | sort | uniq > networkchannel.csv
+awk -F, '{print $1 "-" $3 "," $5}' chan.cql | sort | uniq > modechannel.csv
