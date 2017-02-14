@@ -1,18 +1,10 @@
-/* SAMPLE INPUT
-author: Julia Child|F
-book: Simca's Cuisine: 100 Classic French Recipes for Every Occasion|1972|0-394-40152-2
-authorBook: Simca's Cuisine: 100 Classic French Recipes for Every Occasion|Simone Beck
- */
-
-// CONFIGURATION
-// Configures the data loader to create the schema
-config create_schema: false, load_new: false, load_vertex_threads: 3
+config create_schema: true, load_new: false, load_vertex_threads: 3
 
 // DATA INPUT
 // Define the data input source (a file which can be specified via command line arguments)
 // inputfiledir is the directory for the input files
 
-inputfiledir = './'
+inputfiledir = '/tmp/whois/'
 nickV = File.csv(inputfiledir + "nick.csv").delimiter(',')
 identdV = File.csv(inputfiledir + "identd.csv").delimiter(',')
 hostnameV = File.csv(inputfiledir + "hostname.csv").delimiter(',')
@@ -25,14 +17,15 @@ nickidentdE = File.csv(inputfiledir + "nickidentd.csv").delimiter(',')
 nickhostnameE = File.csv(inputfiledir + "nickhostname.csv").delimiter(',')
 nickrealnameE = File.csv(inputfiledir + "nickrealname.csv").delimiter(',')
 nickchannelE = File.csv(inputfiledir + "nickchannel.csv").delimiter(',')
+nicknetworkE = File.csv(inputfiledir + "nicknetwork.csv").delimiter(',')
 networkchannelE = File.csv(inputfiledir + "networkchannel.csv").delimiter(',')
-channelmodeE = File.csv(inputfiledir + "channelmode.csv").delimiter(',')
+//channelmodeE = File.csv(inputfiledir + "channelmode.csv").delimiter(',')
 
 //Specifies what data source to load using which mapper (as defined inline)
-  
+
 load(nickV).asVertices {
-    label "nickname"
-    key "nickname"
+    label "nick"
+    key "nick"
 }
 
 load(identdV).asVertices {
@@ -71,9 +64,9 @@ load(nickidentdE).asEdges {
         label "nick"
         key "nick"
     }
-    inV "ident", {
-        label "ident"
-        key "ident"
+    inV "identd", {
+        label "identd"
+        key "identd"
     }
 }
 
@@ -125,15 +118,14 @@ load(networkchannelE).asEdges {
     }
 }
 
-load(channelmodeE).asEdges {
-    label "hasAccess"
-    outV "channel", {
-        label "channel"
-        key "channel"
-    }
-    inV "mode", {
-        label "mode"
-        key "mode"
-    }
-}
-
+//load(channelmodeE).asEdges {
+//    label "hasAccess"
+//    outV "channel", {
+//        label "channel"
+//        key "channel"
+//    }
+//    inV "mode", {
+//        label "mode"
+//        key "mode"
+//    }
+//}
