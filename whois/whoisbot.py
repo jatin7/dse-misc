@@ -22,6 +22,7 @@ def send_whois(bot, nick):
     Sends the WHOIS command to the server for the
     specified nick.
     """
+    time.sleep(randint(10,40))
     bot.write(["WHOIS", nick])
     #bot.say("whois sent: " + nick)
 
