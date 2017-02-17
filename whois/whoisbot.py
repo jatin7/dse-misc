@@ -16,6 +16,7 @@ session = cluster.connect(keyspace)
 
 NETWORK = "testnet"
 
+
 def send_whois(bot, nick):
     """
     Sends the WHOIS command to the server for the
@@ -23,6 +24,13 @@ def send_whois(bot, nick):
     """
     bot.write(["WHOIS", nick])
     #bot.say("whois sent: " + nick)
+
+def send_names(bot, channel):
+    """
+    Sends the NAMES command to the server for the
+    specified channel.
+    """
+    bot.write(["NAMES", channel])
 
 @event('319')
 @rule('.*')
@@ -41,6 +49,20 @@ def whois_channels_found(bot, trigger):
         channel = l[1]
         #print ("INSERT INTO whois.chan (network, nick, channel, ts, mode) VALUES ('%s', '%s', '%s', now(), '%s')") %  (NETWORK, nick, channel, mode)
         session.execute (""" INSERT INTO whois.chan (network, nick, channel, ts, mode) VALUES (%s, %s, %s, now(), %s); """, (NETWORK, nick, channel, mode))
+
+@event('353')
+@rule('.*')
+def names_found(bot, trigger):
+    """
+    NAMES response
+    """
+    list1 = trigger.raw.split(":")
+    names = list1[2].split()
+    print("debug")
+    print(names)
+    for i in names:
+       time.sleep(20)
+       send_whois(bot, i)
 
 @event('311')
 @rule('.*')
@@ -63,5 +85,8 @@ def on_join_whois(bot, trigger):
     """
     Trigger on join
     """
-    #bot.say(trigger.raw)
+    l1 = trigger.raw.split()
+    channel = l1[2]
+#    if(bot.nick == trigger.nick):
+#        send_names(bot, channel)
     send_whois(bot, trigger.nick)
