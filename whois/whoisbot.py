@@ -1,3 +1,5 @@
+import time
+from random import randint
 from sopel.module import commands, event, rule
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
