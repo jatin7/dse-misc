@@ -19,13 +19,14 @@ nickrealnameE = File.csv(inputfiledir + "nickrealname.csv").delimiter(',')
 nickchannelE = File.csv(inputfiledir + "nickchannel.csv").delimiter(',')
 nicknetworkE = File.csv(inputfiledir + "nicknetwork.csv").delimiter(',')
 networkchannelE = File.csv(inputfiledir + "networkchannel.csv").delimiter(',')
+hostnamechannelE = File.csv(inputfiledir + "hostnamechannel.csv").delimiter(',')
 //channelmodeE = File.csv(inputfiledir + "channelmode.csv").delimiter(',')
 
 //Specifies what data source to load using which mapper (as defined inline)
 
 load(nickV).asVertices {
-    label "nick"
-    key "nick"
+    label "nickname"
+    key "nickname"
 }
 
 load(identdV).asVertices {
@@ -60,9 +61,9 @@ load(modeV).asVertices {
 
 load(nickidentdE).asEdges {
     label "hasIdent"
-    outV "nick", {
-        label "nick"
-        key "nick"
+    outV "nickname", {
+        label "nickname"
+        key "nickname"
     }
     inV "identd", {
         label "identd"
@@ -72,9 +73,9 @@ load(nickidentdE).asEdges {
 
 load(nickhostnameE).asEdges {
     label "hasHostname"
-    outV "nick", {
-        label "nick"
-        key "nick"
+    outV "nickname", {
+        label "nickname"
+        key "nickname"
     }
     inV "hostname", {
         label "hostname"
@@ -84,9 +85,9 @@ load(nickhostnameE).asEdges {
 
 load(nickrealnameE).asEdges {
     label "hasRealname"
-    outV "nick", {
-        label "nick"
-        key "nick"
+    outV "nickname", {
+        label "nickname"
+        key "nickname"
     }
     inV "realname", {
         label "realname"
@@ -96,9 +97,9 @@ load(nickrealnameE).asEdges {
 
 load(nicknetworkE).asEdges {
     label "connectsTo"
-    outV "nick", {
-        label "nick"
-        key "nick"
+    outV "nickname", {
+        label "nickname"
+        key "nickname"
     }
     inV "network", {
         label "network"
@@ -129,3 +130,27 @@ load(networkchannelE).asEdges {
 //        key "mode"
 //    }
 //}
+
+load(nickchannelE).asEdges {
+    label "joined"
+    outV "nickname", {
+        label "nickname"
+        key "nickname"
+    }
+    inV "channel", {
+        label "channel"
+        key "channel"
+    }
+}
+
+load(hostnamechannelE).asEdges {
+    label "joined"
+    outV "hostname", {
+        label "hostname"
+        key "hostname"
+    }
+    inV "channel", {
+        label "channel"
+        key "channel"
+    }
+}
