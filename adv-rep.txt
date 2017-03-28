@@ -1,0 +1,67 @@
+STORE=10.0.2.5
+HQ=10.0.2.6
+Central=10.0.2.7
+
+# dse.yaml:
+
+advanced_replication_options:
+    enabled: true
+     conf_driver_password_encryption_enabled: false
+
+     # The directory under which Advanced Replication files (e.g. replication log files) will be stored.
+     advanced_replication_directory: /var/lib/cassandra/advrep
+
+     # The base path that will be prepended to paths in the Advanced Replication
+     # configuration locations, including locations to SSL keystore, SSL truststore etc.
+     security_base_path: /base/path/to/advrep/security/files/
+
+# cassandra.yaml:
+
+cdc_enabled: true
+
+## From STORE -> HQ (Using optional source column)
+# Setup STORE schema:
+create keyspace IF NOT EXISTS demo WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+create table demo.store_transaction (trans_id text PRIMARY KEY, status text);
+
+# Setup HQ schema:
+create keyspace IF NOT EXISTS demo WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+create table demo.store_transaction (trans_id text, status text, store_id text, PRIMARY KEY (trans_id, store_id));
+
+# Create destination on STORE
+dse advrep --host 10.0.2.5 --port 9042 destination create --name "hq" --addresses "10.0.2.6" --transmission-enabled
+
+# Create and enable replication channel on STORE
+dse advrep --verbose --host 10.0.2.5 --port 9042 channel create --keyspace demo --table store_transaction --destination hq --data-center-id dc1 --enabled --transmission-enabled --source-id "store123" --source-id-column "store_id"
+
+## From HQ -> STORE (Without optional source column
+
+# Setup HQ schema:
+create keyspace IF NOT EXISTS demo WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+create table demo.sku_mdm (product text, sku text, description text, PRIMARY KEY (product, sku));
+
+# Setup STORE schema (without optional hub id):
+create keyspace IF NOT EXISTS demo WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+create table demo.sku_mdm (product text, sku text, description text, PRIMARY KEY (product, sku));
+
+# Create destination on HQ
+dse advrep --host 10.0.2.6 --port 9042 destination create --name "store123" --addresses "10.0.2.5" --transmission-enabled
+
+# Create and enable replication channel on HQ
+dse advrep --verbose --host 10.0.2.6 --port 9042 channel create --keyspace demo --table sku_mdm --destination store123 --data-center-id dc1 --enabled --transmission-enabled 
+
+## From HQ -> Central (Using optional source column)
+
+# Setup HQ schema (This should already be there):
+create keyspace IF NOT EXISTS demo WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+create table demo.store_transaction (trans_id text, status text, store_id text, PRIMARY KEY (trans_id, store_id));
+
+# Setup Central schema:
+create keyspace IF NOT EXISTS demo WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+create table demo.store_transaction (trans_id text, status text, store_id text, hq_id text, PRIMARY KEY (trans_id, hq_id, store_id));
+
+# Create destination on HQ
+dse advrep --host 10.0.2.6 --port 9042 destination create --name "central" --addresses "10.0.2.7" --transmission-enabled
+
+# Create and enable replication channel on HQ
+dse advrep --verbose --host 10.0.2.6 --port 9042 channel create --keyspace demo --table store_transaction --destination central --data-center-id dc1 --enabled --transmission-enabled --source-id "hq01" --source-id-column "hq_id"
