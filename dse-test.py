@@ -8,7 +8,7 @@ from cassandra.auth import PlainTextAuthProvider
 
 #Configuration
 contactpoints = ['54.159.232.149','54.209.96.0']
-auth_provider = PlainTextAuthProvider (username='russ', password='DevryPOC')
+auth_provider = PlainTextAuthProvider (username='russ', password='Password123')
 keyspace = "test"
 query = "SELECT * FROM test.table1"
 
