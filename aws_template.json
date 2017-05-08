@@ -1,0 +1,213 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+        "Node0": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "ImageId": "ami-6869aa05",
+                "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+                    "#!/bin/bash -xe\n",
+                    "echo test > /tmp/test1 \n",
+                    "/opt/aws/bin/cfn-init -v ",
+                    "         --stack ", { "Ref" : "AWS::StackId" },
+                    "         --resource Node0 ",
+                    "         --region ", { "Ref" : "AWS::Region" }, "\n"
+                ]]}},
+                "KeyName" : "rik_aws_default",
+                "AvailabilityZone": "us-east-1a",
+                "InstanceType": "t2.micro",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "VolumeType": "gp2",
+                            "DeleteOnTermination": "true",
+                            "VolumeSize": "20"
+                        }
+                    },
+                    {
+                        "DeviceName": "/dev/xvdb",
+                        "Ebs": {
+                            "VolumeType": "gp2",
+                            "DeleteOnTermination": "true",
+                            "VolumeSize": "1"
+                        }
+                    },
+                    {
+                        "DeviceName": "/dev/xvdc",
+                        "Ebs": {
+                            "VolumeType": "gp2",
+                            "DeleteOnTermination": "true",
+                            "VolumeSize": "1"
+                        }
+                    },
+                    {
+                        "DeviceName": "/dev/xvdd",
+                        "Ebs": {
+                            "VolumeType": "gp2",
+                            "DeleteOnTermination": "true",
+                            "VolumeSize": "1"
+                        }
+                    },
+                    {
+                        "DeviceName": "/dev/xvde",
+                        "Ebs": {
+                            "VolumeType": "gp2",
+                            "DeleteOnTermination": "true",
+                            "VolumeSize": "1"
+                        }
+                    }
+                ],
+                "NetworkInterfaces": [
+                    {
+                        "DeviceIndex": "0",
+                        "AssociatePublicIpAddress": true,
+                        "SubnetId": {
+                            "Ref": "Subnet01"
+                        }
+                    }
+                ]
+            },    
+            "Metadata": {
+                "AWS::CloudFormation::Init": {
+                    "config": {
+                    "commands": {
+                        "01_test": {
+                            "command": "echo \"hello\" > /tmp/hello",
+                            "cwd" : "/tmp",
+                            "ignoreErrors" : "false"
+                        },
+                        "02_mdadm": {
+                            "command": "sudo mdadm -C /dev/md0 -l raid0 -n 4 /dev/xvd[b-e]",
+                            "cwd": "~"
+                        },
+                        "03_fdisk": {
+                            "command": "echo -e \"np\\n\\n\\n\\n\\nw\" | sudo fdisk /dev/md0",
+                            "cwd": "~"
+                        },
+                        "04_mkfs": {
+                            "command": "sudo mkfs.ext4 /dev/md0p1",
+                            "cwd": "~"
+                        },
+                        "05_mkdir": {
+                            "command": "mkdir /raid",
+                            "cwd": "~"
+                        },
+                        "06_mount": {
+                            "command": "mount /dev/md0p1 /raid",
+                            "cwd": "~"
+                        }                   
+                    }
+                }
+            }}
+        },
+        "VPC01": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": "10.0.0.0/16"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "7d931697-c61c-4c93-8c14-03060fa2fc00"
+                }
+            }
+        },
+        "Subnet01": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPC01"
+                },
+                "CidrBlock": "10.0.0.0/24",
+                "AvailabilityZone": "us-east-1a"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "3c12e99d-00c9-4912-b588-3888cb172c80"
+                }
+            },
+            "DependsOn": [
+                "VPC01"
+            ]
+        },
+        "Gateway01": {
+            "Type": "AWS::EC2::InternetGateway",
+            "Properties": {},
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "bc9579f5-718b-4df3-be1b-7d5417e17d06"
+                }
+            },
+            "DependsOn": [
+                "VPC01"
+            ]
+        },
+        "AttachGW01": {
+            "Type": "AWS::EC2::VPCGatewayAttachment",
+            "Properties": {
+                "InternetGatewayId": {
+                    "Ref": "Gateway01"
+                },
+                "VpcId": {
+                    "Ref": "VPC01"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "38149e6e-82aa-4266-8088-774465850485"
+                }
+            }
+        },
+        "DefaultRoute": {
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId" : { "Ref" : "Gateway01" },
+                "RouteTableId": {
+                    "Ref": "RTABLE01"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "69aed130-b2bc-4aad-b584-2b901750ee34"
+                }
+            },
+            "DependsOn": [
+                "RTABLE01"
+            ]
+        },
+        "RTABLE01": {
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPC01"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "2fe5274e-980f-4e50-8bd8-0105e727df33"
+                }
+            },
+            "DependsOn": [
+                "Gateway01"
+            ]
+        },
+        "AssociateSubnet01": {
+            "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties" : {
+                "RouteTableId" : { "Ref" : "RTABLE01" },
+                "SubnetId" : { "Ref" : "Subnet01" }
+            }
+        },
+        "SecurityGroup01" : {
+            "Type" : "AWS::EC2::SecurityGroup",
+            "Properties" : {
+                "GroupDescription" : "Enable HTTP access via port 80",
+                "SecurityGroupIngress" : [
+                    {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"},
+                    {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : "0.0.0.0/0"}
+        ]
+      }      
+    }          
+  }
+}
