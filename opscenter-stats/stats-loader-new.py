@@ -1,30 +1,29 @@
 #!/usr/bin/python
 
 import sys
+from random import randint
 
-from dse.cluster import Cluster, ExecutionProfile
+from dse.cluster import Cluster, ExecutionProfile, EXEC_PROFILE_DEFAULT
 from dse.policies import DCAwareRoundRobinPolicy,TokenAwarePolicy, ConstantSpeculativeExecutionPolicy
 from dse import ConsistencyLevel
 
-from random import randint
-
 #Configuration
-contactpoints = ['172.31.0.20','172.31.11.158']
+contactpoints = ['172.31.13.134', '172.31.4.17']
 localDC = "dc2"
 keyspace = "stats"
-profile1 = ExecutionProfile(TokenAwarePolicy(DCAwareRoundRobinPolicy(local_dc=localDC, used_hosts_per_remote_dc=3)))
-CL = ConsistencyLevel.LOCAL_QUORUM
-#CL = ConsistencyLevel.LOCAL_ONE
+CL = ConsistencyLevel.ONE
+profile1 = ExecutionProfile( load_balancing_policy=DCAwareRoundRobinPolicy(local_dc=localDC, used_hosts_per_remote_dc=3),
+                            speculative_execution_policy=ConstantSpeculativeExecutionPolicy(.1, 20),
+                            consistency_level = CL
+                            )
 
 print "Connecting to cluster"
 
 cluster = Cluster( contact_points=contactpoints,
-                   execution_profiles={"profile1": profile1}
+                   execution_profiles={EXEC_PROFILE_DEFAULT: profile1},
                    )
 
 session = cluster.connect(keyspace)
-session.default_consistency_level = CL
-session.retry_policy = ConstantSpeculativeExecutionPolicy( delay=0.07, max_attempts=2,)
 
 c = 0
 x = 0
