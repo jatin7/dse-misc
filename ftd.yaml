@@ -1,0 +1,59 @@
+statements:
+- name: write-cart
+  group: write
+  statement: |
+    INSERT INTO cart.ftd_cart (id, itemid, giftMessage, deliveryOptions, accessories,coupon, deliveryamount, discountamount, discountpercent, email, floristamount, itemcount, membertype, ordernumber, profileid, promomessage, subtotalamount, taxamount, totalamount, imageurl, listedprice, productid, quantity, saleprice, sku, sourcecode, subtotalprice, title, description) VALUES ( ?id, ?itemid, {occasion: ?gm_occasion, message: ?gm_message}, {method: ?do_method, deliveryOption: ?do_deliveryOption, floristFee: ?do_floristFee, message: ?do_message, fee: ?do_fee,  deliveryDate: ?do_deliveryDate, zipCode: ?do_zipCode, deliveryLocation: ?do_deliverLocation, state: ?do_state},{id: ?a_id, type: ?a_type, productId: ?a_producrId, name: ?a_name, imageUrl: ?a_imageUrl, price: ?a_price, quantity: ?a_quantity, minQuantity: ?a_minQuantity, maxQuantity: ?a_maxQuantity, occasion: ?a_occasion}, ?coupon, ?deliveryamount, ?discountamount, ?discountpercent, ?email, ?floristamount, ?itemcount, ?membertype, ?ordernumber, ?profileid, ?promomessage, ?subtotalamount, ?taxamount, ?totalamount, ?imageurl, ?listedprice, ?productid, ?quantity, ?saleprice, ?sku, ?sourcecode, ?subtotalprice, ?title, ?description );
+  bindings:
+    id: compose Mod(1000); NumberNameToString() -> String
+    itemid: compose Mod(1000); NumberNameToString() -> String
+    gm_occasion: WeightedStrings('Birthday:100;Anniversary:100;Graduation:100;None:100;Wedding:100;')
+    gm_message: WeightedStrings('Happy Birthday:100;Hope you last a long time:100;time to go find a good job:100;none:100;congrats on the baby:100;')
+    do_method: WeightedStrings('UPS:100;FedEx Overnight:100;USPS Priority:100;USPS Overnight:100;')
+    do_deliveryOption: WeightedStrings('Sunday Delivery:10;Overnight:40;Two Day:60;')
+    do_floristFee: Combinations('1-200;.;0-9;0-9;')
+    do_message: WeightedStrings('leave on front porch:100;leave under chair:100;dont ring the bell:100;')
+    do_fee: Combinations('1-20;.;0-9;0-9;')
+    do_deliveryDate: Combinations('1-12;/;1-31;/;2019;')
+    do_deliverLocation: WeightedStrings('house:100;office:100;')
+    do_zipCode: Combinations('1-9;0-9;0-9;0-9;0-9;')
+    do_state: WeightedStrings('California:372;Texas:251;New York:193;Florida:188;Illinois:128;Pennsylvania:127;Ohio:115;Michigan:98;Georgia:96;North Carolina:95;New Jersey:87;Virginia:80;Washington:67;Massachusetts:65;Indiana:64;Arizona:63;Tennessee:63;Missouri:59;Maryland:57;Wisconsin:56;Minnesota:53;Colorado:50;Alabama:47;South Carolina:46;Louisiana:45;Kentucky:43;Oregon:38;Oklahoma:37;Connecticut:35;Iowa:30;Mississippi:29;Arkansas:29;Kansas:28;Utah:27;Nevada:27;New Mexico:20;West Virginia:18;Nebraska:18;Idaho:15;Hawaii:13;Maine:13;New Hampshire:13;Rhode Island:10;Montana:9;Delaware:8;South Dakota:8;Alaska:7;North Dakota:6;Vermont:6;Washington D. C.:6;Wyoming:5;')
+    a_id: compose Mod(1000); NumberNameToString() -> String
+    a_type: WeightedStrings('flowers:100;Chocolate:100;Fruit:100;Berries:100;Robe:100;')
+    a_producrId: Combinations('1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;')
+    a_name: Combinations('Order Number;0-1000A-Z;')
+    a_imageUrl: WeightedStrings('httpwww.image.urlpicture1.jpg:100;httpwww.image.urlpicture2.jpg:100;')
+    a_price: compose Combinations('1-200;.;0-9;0-9;')
+    a_quantity: Combinations('1-20;')
+    a_minQuantity: Combinations('1-20;')
+    a_maxQuantity: Combinations('1-20;')
+    a_occasion: compose Mod(1); WeightedStrings('Birthday:100;Anniversary:100;Graduation:100;None:100;Wedding:100;')
+    coupon: Combinations('1-200;0-9;0-9;A-Z;A-Z;A-Z')
+    deliveryamount: Combinations('1-20;.;0-9;0-9;')
+    discountamount: Combinations('1-20;.;0-9;0-9;')
+    discountpercent: Combinations('1-20')
+    email: Combinations('a-z;a-z;a-z;a-z;a-z;0-100;@;a-z;a-z;a-z;a-z;.com;')
+    floristamount: Combinations('1-20;.;0-9;0-9;')
+    itemcount: Combinations('1-20')
+    membertype: WeightedStrings('Member:100;Guest:50;')
+    ordernumber: Combinations('1-100;0-9;0-9;0-9A-Z;0-9A-Z;A-Z')
+    profileid: Combinations('1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;')
+    promomessage: WeightedStrings('This was a gift:100;You got a coupon:100;thanks for being a valueable customer:100;')
+    subtotalamount: Combinations('1-20;.;0-9;0-9;')
+    taxamount: Combinations('1-20;.;0-9;0-9;')
+    totalamount: Combinations('1-200;.;0-9;0-9;')
+    imageurl: WeightedStrings('httpwww.image.newurl.jpg:100;httpwww.image.newurl.jpg:100;')
+    listedprice: compose Combinations('1-200;.;0-9;0-9;')
+    productid: Combinations('1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;')
+    quantity: compose Mod(10); Combinations('1-20')
+    saleprice: compose Mod(20); Combinations('1-200;.;0-9;0-9;')
+    sku: compose Mod(100); Combinations('1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;')
+    sourcecode: compose Mod(5); Combinations('1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;1-9A-Z;')
+    subtotalprice: compose Mod(50); Combinations('1-200;.;0-9;0-9;')
+    title: Combinations('Title;0-9a-z;0-9a-z;0-9a-z;0-9a-z;')
+    description: compose Mod(10); Combinations('Description;0-9a-z;0-9a-z;0-9a-z;0-9a-z;')
+- name: read-cart
+  group: read
+  statement: |
+    SELECT * FROM cart.ftd_cart WHERE id = ?id;
+  bindings:
+    id: compose Mod(1000); NumberNameToString() -> String
