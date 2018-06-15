@@ -4,14 +4,17 @@ import sys
 from random import randint
 
 from dse.cluster import Cluster, ExecutionProfile, EXEC_PROFILE_DEFAULT
+from dse.auth import PlainTextAuthProvider
 from dse.policies import DCAwareRoundRobinPolicy,TokenAwarePolicy, ConstantSpeculativeExecutionPolicy
 from dse import ConsistencyLevel
 
 #Configuration
-contactpoints = ['172.31.13.134', '172.31.4.17']
-localDC = "dc2"
+contactpoints = ['172.31.16.8', '172.31.17.8']
+localDC = "DC1"
 keyspace = "stats"
-CL = ConsistencyLevel.ONE
+CL = ConsistencyLevel.TWO
+#CL = ConsistencyLevel.ALL
+auth_provider = PlainTextAuthProvider (username='user1', password='password1')
 profile1 = ExecutionProfile( load_balancing_policy=DCAwareRoundRobinPolicy(local_dc=localDC, used_hosts_per_remote_dc=3),
                             speculative_execution_policy=ConstantSpeculativeExecutionPolicy(.1, 20),
                             consistency_level = CL
@@ -20,6 +23,7 @@ profile1 = ExecutionProfile( load_balancing_policy=DCAwareRoundRobinPolicy(local
 print "Connecting to cluster"
 
 cluster = Cluster( contact_points=contactpoints,
+                   auth_provider=auth_provider,
                    execution_profiles={EXEC_PROFILE_DEFAULT: profile1},
                    )
 
