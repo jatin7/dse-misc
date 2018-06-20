@@ -1,0 +1,60 @@
+params:
+  cl: ONE
+bindings:
+  source: Mod(<<sources:1000>>) -> int
+  param: HashedLineToString('data/variable_words.txt')
+  ts: ToDate()
+  data: HashedFileExtractToString('data/lorem_ipsum_full.txt',100,200)
+  cycle: Identity()
+blocks:
+  # ebdse start type=cql yaml=telemetry/telemetry-schema host=...
+ - tags:
+     group: schema
+   params:
+    prepared: false
+   statements:
+    - |
+      create keyspace if not exists <<keyspace:testks>>
+      WITH replication = <<replication:{'class': 'SimpleStrategy', 'replication_factor': '1'}>>
+      AND durable_writes = true;
+    - |
+      create table if not exists <<keyspace:testks>>.<<table:telemetry>> (
+      source int,      // data source id
+      param text,      // variable name for a type of measurement
+      ts timestamp,    // timestamp of measurement
+      cycle bigint,    // cycle, for diagnostics
+      data text,       // measurement data
+      PRIMARY KEY (source, param, ts)
+      ) WITH CLUSTERING ORDER BY (param ASC, ts DESC)
+ - tags:
+     group: write
+   statements:
+    - write: "insert into <<keyspace:testks>>.<<table:telemetry>> (source, param, ts, data, cycle) values ({source},{param},{ts},{data},{cycle});"
+ - tags:
+     group: verify
+   statements:
+     - verify: "select * from <<keyspace:testks>>.<<table:telemetry>> where source={source} and param={param} and ts={ts};"
+ - tags:
+     group: read
+   statements:
+    - read: "select * from <<keyspace:testks>>.<<table:telemetry>> where source={source} and param={param} limit 10;"
+ - tags:
+     group: batch-write
+   statements:
+   - |
+     begin batch
+     insert into <<KEYSPACE:testks>>.<<TABLE:telemetry>> (source, param, ts, data, cycle)
+     values ({source1},{param1},{ts1},{data1},{cycle});
+     insert into <<KEYSPACE:testks>>.<<TABLE:telemetry>> (source, param, ts, data, cycle)
+     values ({source2},{param2},{ts2},{data2},{cycle});
+     apply batch
+   bindings:
+     cycle: Identity()
+     source1: Mod(<<sources:1000>>) -> int
+     param1: HashedLineToString('data/variable_words.txt')
+     ts1: ToDate()
+     data1: HashedFileExtractToString('data/lorem_ipsum_full.txt',100,200)
+     source2: Mod(<<sources:1000>>) -> int
+     param2: HashedLineToString('data/variable_words.txt')
+     ts2: ToDate()
+     data2: HashedFileExtractToString('data/lorem_ipsum_full.txt',100,200)
